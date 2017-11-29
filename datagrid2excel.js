@@ -12,7 +12,7 @@
 
 	defaults = {
 		exclude: ".noExl",
-    			name: "Table2Excel"
+		name: "Table2Excel"
 	};
 
 	// The actual plugin constructor
@@ -46,7 +46,7 @@
 				},
 				foot: "</body></html>"
 			};
-			console.log(e.template);
+//			console.log(e.template);
 			e.tableRows = [];
 
 			// get contents of table except for exclude
@@ -72,10 +72,47 @@
             if(e.settings.exclude_inputs) {
                 e.tableRows[0] = exclude_inputs(e.tableRows[0])
             }
-
-			e.tableToExcel(e.tableRows, e.settings.name);
+			e.tableToExcel([e.getTable(e.element.id)], e.settings.name);
 		},
-
+		getTable : function(id){
+			return this.getHeader(id)+this.getBody(id);
+		},
+		getHeader : function(id) {
+			var headerTds = $("#"+id+" div.datagrid-view2 div.datagrid-header div.datagrid-header-inner table.datagrid-htable tbody tr.datagrid-header-row td");
+		   	 var tds ;
+		   	 var h = '<tr>';
+		   	 for(var i =0;i<headerTds.length;i++) {
+		   		 tds = $(headerTds[i]);
+		   		 if(tds[0].style.display != 'none') {
+		   			 h += '<td>' + tds[0].firstChild.firstChild.innerText + '</td>';
+		   		 }
+		   		
+		   	 }
+		   	 h += '</tr>';
+		   	 return h;
+		},
+		getBody : function(id) {
+		  	 var bodies = $("#"+id+" div.datagrid-view2 div.datagrid-body table.datagrid-btable tbody tr")
+		   	 var tds ;
+		   	 var bodyData = '';
+		   	 for(var i =0;i<bodies.length;i++) {
+		   		 bodyData += this.getTdContent(bodies[i]);
+		   	 }
+		   	 return bodyData;
+		},
+		getTdContent :  function (tr) {
+		   	 var trChildren = $(tr)[0].children;
+		   	 var td;
+		   	 var tbody = '<tr>';
+		   	 for( var i=0;i<trChildren.length;i++) {
+		   		 td = trChildren[i];
+		   		 if(td.style.display != 'none') {
+		   			 tbody += '<td>' + td.firstChild.innerHTML + '</td>';
+		   		 }
+		   	 }
+		   	 tbody += '</tr>';
+		   	 return tbody;
+		    },
 		tableToExcel: function (table, name) {
 			var e = this, fullTemplate="", i, link, a;
 
@@ -148,9 +185,9 @@
 
 		}
 	};
-
+   
 	function getFileName(settings) {
-		return ( settings.filename ? settings.filename : "table2excel") + ".xlsx";
+		return ( settings.filename ? settings.filename : "table2excel") + ".xls";
 	}
 
 	// Removes all img tags
@@ -181,3 +218,20 @@
 	};
 
 })( jQuery, window, document );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
